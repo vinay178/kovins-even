@@ -1,0 +1,27 @@
+version: '3'
+
+services:   
+  nodejs:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: nodejs
+    container_name: nodejs
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - PORT=3000
+      - NODE_ENV=development
+      - API_BASE=/api/v1
+      - DB_DEV_URL=172.17.0.3
+      - DB_DEV_USERNAME=root
+      - DB_DEV_PASSWORD=password
+      - DB_DEV_DATABASE=project
+    ports:
+      - "8000:8000"
+    command: npm start
+    volumes:
+      - .:/usr/src/app
+      - node_modules:/usr/src/app/node_modules
+volumes:
+  node_modules:

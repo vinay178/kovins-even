@@ -1,0 +1,1496 @@
+openapi: 3.0.0
+info:
+  description: >-
+    Organization server API document. Server is built with NodeJs using CLEAN
+    architecture
+  version: 1.0.0
+  title: Organization Server
+  contact:
+    email: raisonjosephau@gamil.com
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+servers:
+  - url: 'http://api.example.com/v1'
+  - url: 'https://api.example.com/v1'
+tags:
+  - name: Organization
+    description: Organization related APIs
+  - name: Roles
+    description: APIs for managing roles
+  - name: Department
+    description: APIs for managing departments
+  - name: Location
+    description: APIs for managing location
+  - name: Users/Employee
+    description: APIs for managing users/employees
+    
+paths:
+  '/organiztions/':
+    get:
+      tags:
+        - Organization
+      summary: Get organizations
+      description: ''
+      operationId: getOrganization
+      parameters:
+        - name: role
+          in: header
+          required: true
+          description: Organization id to be edited
+          schema:
+            type: string
+            enum:
+              - admin
+              - user
+            minimum: 1
+      responses:
+        '200':
+          description: Fetch organization details. Depends on the user role.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    oneOf:
+                      - allOf:
+                          - $ref: '#/components/schemas/User'
+                          - type: object
+                            properties:
+                              organization:
+                                $ref: '#/components/schemas/Organization'
+                      - type: array
+                        items:
+                          $ref: '#/components/schemas/OrganizationList'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSeverFailureResponse'
+    post:
+      tags:
+        - Organization
+      summary: Add a new organization to the database
+      description: ''
+      operationId: addOrganization
+      requestBody:
+        description: Organization to add to the system
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Organization'
+      responses:
+        '201':
+          description: Successful post
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Organization'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSeverFailureResponse'
+                
+  '/organiztions/{organizationId}':
+    patch:
+      tags:
+        - Organization
+      summary: Edit/Modify organization
+      description: ''
+      operationId: patchOrganization
+      parameters:
+        - name: organizationId
+          in: path
+          required: true
+          description: Organization id to be edited
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      requestBody:
+        description: Organization details to be edited
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Organization'
+      responses:
+        '201':
+          description: Successful patch
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Organization'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSeverFailureResponse'
+                
+    delete:
+      tags:
+        - Organization
+      summary: Delete an existing organization
+      description: ''
+      operationId: deleteOrganization
+      parameters:
+        - name: organizationId
+          in: path
+          required: true
+          description: Organization id to be deleted
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      responses:
+        '200':
+          description: Successful delete
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiDeleteResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSeverFailureResponse'
+                
+  '/organiztions/{organizationId}/users/':
+    get:
+      tags:
+        - Organization
+      summary: Get all the users under an organizations
+      description: ''
+      operationId: getOrganizationUsers
+      parameters:
+        - name: organizationId
+          in: path
+          required: true
+          description: Organization id from which users needs to fetched
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      responses:
+        '200':
+          description: List of users belongs to the organization specified
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSeverFailureResponse'
+                
+  '/organiztions/{organizationId}/managers/':
+    get:
+      tags:
+        - Organization
+      summary: Get all the managers under an organizations
+      description: ''
+      operationId: getOrganizationManages
+      parameters:
+        - name: organizationId
+          in: path
+          required: true
+          description: Organization id from which mangers needs to fetched
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      responses:
+        '200':
+          description: List of managers belongs to the organization specified
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      allOf:
+                        - $ref: '#/components/schemas/User'
+                        - type: object
+                          properties:
+                            role:
+                              $ref: '#/components/schemas/Role'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSeverFailureResponse'
+                
+  '/organiztions/{organizationId}/departments/':
+    get:
+      tags:
+        - Organization
+      summary: Get all the departments under an organizations
+      description: ''
+      operationId: getOrganizationDepartments
+      parameters:
+        - name: organizationId
+          in: path
+          required: true
+          description: Organization id from which departments needs to fetched
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      responses:
+        '200':
+          description: List of departments belongs to the organization specified
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Department'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSeverFailureResponse'
+                
+  '/organiztions/{organizationId}/locations/':
+    get:
+      tags:
+        - Organization
+      summary: Get all the locations under an organizations
+      description: ''
+      operationId: getOrganizationLocations
+      parameters:
+        - name: organizationId
+          in: path
+          required: true
+          description: Organization id from which locations needs to fetched
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      responses:
+        '200':
+          description: List of locations belongs to the organization specified
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Location'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSeverFailureResponse'
+                
+  '/roles/':
+    get:
+      tags:
+        - Roles
+      summary: Get roles from the database
+      description: ''
+      operationId: getRoles
+      responses:
+        '200':
+          description: Roles from the system
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      allOf:
+                        - $ref: '#/components/schemas/Role'
+                        - type: object
+                          properties:
+                            organization:
+                              $ref: '#/components/schemas/Department'
+                    
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSeverFailureResponse'
+    post:
+      tags:
+        - Roles
+      summary: Add a new role to the system
+      description: ''
+      operationId: addRole
+      requestBody:
+        description: Role to add to the system
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Role'
+      responses:
+        '201':
+          description: Successful post
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default: true
+                  data:
+                    $ref: '#/components/schemas/Role'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSeverFailureResponse'
+                
+  '/roles/{roleId}':
+    get:
+      tags:
+        - Roles
+      summary: Get a specific role and details from the database
+      description: ''
+      operationId: getRole
+      parameters:
+        - name: roleId
+          in: path
+          required: true
+          description: Id of the role to be fetched
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      responses:
+        '200':
+          description: Details of the specified Role
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    allOf:
+                      - $ref: '#/components/schemas/Role'
+                      - type: object
+                        properties:
+                          organization:
+                            $ref: '#/components/schemas/Organization'
+                          users:
+                            type: array
+                            items: 
+                              $ref: '#/components/schemas/User'
+                          entitlements:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/Entitlements'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSeverFailureResponse'
+    patch:
+      tags:
+        - Roles
+      summary: Edit/Modify role
+      description: ''
+      operationId: patchRole
+      parameters:
+        - name: roleId
+          in: path
+          required: true
+          description: Role id to be edited
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      requestBody:
+        description: Role details. Details that needs to be updated
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Role'
+      responses:
+        '201':
+          description: Successful patch
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Role'
+                    
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSeverFailureResponse'
+    delete:
+      tags:
+        - Roles
+      summary: Delete an existing role
+      description: ''
+      operationId: deleteRole
+      parameters:
+        - name: roleId
+          in: path
+          required: true
+          description: Role id to be deleted
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+            
+      responses:
+        '200':
+          description: Successful delete
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiDeleteResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSeverFailureResponse'
+    
+  '/departments/':
+    get:
+      tags:
+        - Department
+      summary: Get departments from the database
+      description: ''
+      operationId: getDepartments
+      responses:
+        '200':
+          description: Fetched departments from the system
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Department'
+                    
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSeverFailureResponse'
+    post:
+      tags:
+        - Department
+      summary: Add a new department to the system
+      description: ''
+      operationId: addDepartment
+      requestBody:
+        description: Department need to be added to the system
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Department'
+      responses:
+        '201':
+          description: Successful post
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default: true
+                  data:
+                    $ref: '#/components/schemas/Department'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSeverFailureResponse'
+  
+  '/departments/{departmentId}':
+    get:
+      tags:
+        - Department
+      summary: Get a specific department details from the database
+      description: ''
+      operationId: getDepartment
+      parameters:
+        - name: departmentId
+          in: path
+          required: true
+          description: Id of the department to be fetched
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      responses:
+        '200':
+          description: Details of the specified department
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Department'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSeverFailureResponse'
+    patch:
+      tags:
+        - Department
+      summary: Edit/Modify department
+      description: ''
+      operationId: patchDepartment
+      parameters:
+        - name: departmentId
+          in: path
+          required: true
+          description: Department id to be edited
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      requestBody:
+        description: Department details. Details that needs to be updated
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Department'
+      responses:
+        '201':
+          description: Successful post
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Department'
+                    
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSeverFailureResponse'
+    delete:
+      tags:
+        - Department
+      summary: Delete an existing department
+      description: ''
+      operationId: deleteDepartment
+      parameters:
+        - name: departmentId
+          in: path
+          required: true
+          description: Department id to be deleted
+          schema:
+            type: integer
+            format: int64  
+            minimum: 1
+            
+      responses:
+        '200':
+          description: Successful delete
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiDeleteResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSeverFailureResponse'
+
+  '/locations/':
+    get:
+      tags:
+        - Location
+      summary: Get locations from the database
+      description: ''
+      operationId: getLocations
+      responses:
+        '200':
+          description: Fetched location from the system
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Location'
+                    
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSeverFailureResponse'
+    post:
+      tags:
+        - Location
+      summary: Add a new location to the system
+      description: ''
+      operationId: addLocation
+      requestBody:
+        description: Location need to be added to the system
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Location'
+      responses:
+        '201':
+          description: Successful post
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default: true
+                  data:
+                    $ref: '#/components/schemas/Location'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSeverFailureResponse'
+  
+  '/locations/{locationId}':
+    get:
+      tags:
+        - Location
+      summary: Get a specific location details from the database
+      description: ''
+      operationId: getLocation
+      parameters:
+        - name: locationId
+          in: path
+          required: true
+          description: Id of the location to be fetched
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      responses:
+        '200':
+          description: Details of the specified location
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Location'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSeverFailureResponse'
+    patch:
+      tags:
+        - Location
+      summary: Edit/Modify location
+      description: ''
+      operationId: patchLocation
+      parameters:
+        - name: locationId
+          in: path
+          required: true
+          description: Location id to be edited
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      requestBody:
+        description: Location details. Details that needs to be updated
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Location'
+      responses:
+        '201':
+          description: Successful post
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Location'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSeverFailureResponse'
+    delete:
+      tags:
+        - Location
+      summary: Delete an existing location
+      description: ''
+      operationId: deleteLocation
+      
+      parameters:
+        - name: locationId
+          in: path
+          required: true
+          description: Location id to be deleted
+          schema:
+            type: integer
+            format: int64  
+            minimum: 1
+            
+      responses:
+        '200':
+          description: Successful delete
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiDeleteResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSeverFailureResponse'
+                
+  '/users/':
+    get:
+      tags:
+        - Users/Employee
+      summary: Get users from the database
+      description: ''
+      operationId: getUsers
+      responses:
+        '200':
+          description: Details of the users
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      allOf:
+                        - $ref: '#/components/schemas/User'
+                        - type: object
+                          properties:
+                            role :
+                              $ref: '#/components/schemas/Role'
+                            department :
+                              $ref: '#/components/schemas/Department'
+                            location :
+                              $ref: '#/components/schemas/Location'
+                            manager:
+                              $ref: '#/components/schemas/User'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSeverFailureResponse'
+    post:
+      tags:
+        - Users/Employee
+      summary: Add a new user to the system
+      description: ''
+      operationId: addUser
+      requestBody:
+        description: User need to be added to the system
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '201':
+          description: Successful post
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default: true
+                  data:
+                    $ref: '#/components/schemas/User'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSeverFailureResponse'
+                
+  '/users/{userId}':
+    get:
+      tags:
+        - Users/Employee
+      summary: Get specifed user from the database
+      description: ''
+      operationId: getUser
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: Id of the user to be fetched
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      responses:
+        '200':
+          description: Details of the specified user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    allOf:
+                      - $ref: '#/components/schemas/User'
+                      - type: object
+                        properties:
+                          role :
+                            $ref: '#/components/schemas/Role'
+                          department :
+                            $ref: '#/components/schemas/Department'
+                          location :
+                            $ref: '#/components/schemas/Location'
+                          manager:
+                            $ref: '#/components/schemas/User'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSeverFailureResponse'
+    patch:
+      tags:
+        - Users/Employee
+      summary: Edit/Modify user details
+      description: ''
+      operationId: patchUser
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: User id to be edited
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      requestBody:
+        description: User details. Details that needs to be updated
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '201':
+          description: Successful post
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Location'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSeverFailureResponse'
+    delete:
+      tags:
+        - Users/Employee
+      summary: Delete an existing user
+      description: ''
+      operationId: deleteUser
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: User id to be edited
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+            
+      responses:
+        '200':
+          description: Successful delete
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiDeleteResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSeverFailureResponse'
+
+security: 
+  - ApiKeyAuth: []
+  
+components:
+  securitySchemes:
+    ApiKeyAuth:        # arbitrary name for the security scheme
+      description: "`JWT Token`. Place the JWT token in the value field"
+      type: apiKey
+      in: header       # can be "header", "query" or "cookie"
+      name: authorization
+  
+  schemas:
+    Organization  :
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        org_name:
+          type: string
+          minLength: 3
+        smart_verification_type:
+          type: string
+          enum:
+            - recognition
+            - verification
+        geofencing_active:
+          type: boolean
+        geofencing_radius:
+          type: number
+          format: double
+        website_access_active:
+          type: boolean
+        license_plan_type:
+          type: string
+        license_key:
+          type: string
+        is_active:
+          type: boolean
+        geo_fencing_type_id:
+          type: integer
+          format: int64
+        country_id:
+          type: integer
+          format: int64
+        time_stamp:
+          type: string
+          format: date-time
+        deleted:
+          type: boolean
+          default: false
+    OrganizationList:
+      description: >-
+        The actual data returned when the GET request is called by an admin.
+        This schema is constructed to show the response of organization get
+        request and the schema model do not exist in DB
+      allOf:
+        - $ref: '#/components/schemas/Organization'
+        - type: object
+          properties:
+            country:
+              $ref: '#/components/schemas/Country'
+            geo_fencing_type:
+              $ref: '#/components/schemas/GeoFencingType'
+            org_departments:
+              type: array
+              items:
+                $ref: '#/components/schemas/Department'
+            org_roles:
+              type: array
+              items:
+                $ref: '#/components/schemas/Role'
+            locations:
+              type: array
+              items:
+                $ref: '#/components/schemas/Location'
+    Role:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        role_name:
+          type: string
+          minLength: 3
+        is_active:
+          type: boolean
+        organization_id:
+          type: integer
+          format: int64
+        parent_role:
+          type: integer
+          format: int64
+        time_stamp:
+          type: string
+          format: date-time
+        deleted:
+          type: boolean
+          default: fals
+        
+        reporting_role:
+          description: 'Details of the `parent_role`, which is simliar to the Role object itself. This feild can be nullable'
+          type: object
+          nullable: true
+          
+    Department:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        dept_name:
+          type: string
+          minLength: 3
+        parent_dept:
+          type: integer
+          format: int64
+        is_active:
+          type: boolean
+        organization_id:
+          type: integer
+          format: int64
+        time_stamp:
+          type: string
+          format: date-time
+        deleted:
+          type: boolean
+          default: false
+    Location:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+          minLength: 3
+        address:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        pincode:
+          type: string
+        organization_id:
+          type: integer
+          format: int64
+        is_active:
+          type: boolean
+          default: true
+        country_id:
+          type: integer
+          format: int64
+        time_stamp:
+          type: string
+          format: date-time
+        deleted:
+          type: boolean
+          default: false
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        firstname:
+          type: string
+          minLength: 3
+        lastname:
+          type: string
+          minLength: 3
+        gender:
+          type: string
+          enum:
+            - male
+            - female
+            - others
+        emailaddress:
+          type: string
+          format: email
+        phone_number:
+          type: string
+        roles_id:
+          type: integer
+          format: int64
+        department_id:
+          type: integer
+          format: int64
+        locations_id:
+          type: integer
+          format: int64
+        manager_id:
+          type: integer
+          format: int64
+        is_active:
+          type: boolean
+        time_stamp:
+          type: string
+          format: date-time
+        deleted:
+          type: boolean
+          default: false
+    Country:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+          minLength: 3
+        time_stamp:
+          type: string
+          format: date-time
+    GeoFencingType:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        country_name:
+          type: string
+          minLength: 3
+        time_stamp:
+          type: string
+          format: date-time
+          
+    Entitlements:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        oper_name:
+          type: string
+          minLength: 3
+        is_active:
+          type: boolean
+        roles_id:
+          type: integer
+          format: int64
+        time_stamp:
+          type: string
+          format: date-time
+        deleted:
+          type: boolean
+          default: false
+      
+    ApiDeleteResponse:
+      type: object
+      properties:
+        deletedCount:
+          type: integer
+          format: int64
+          description: Count of deleted organizations
+        message:
+          type: string
+    ApiSuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          default: true
+        data:
+          type: object
+    ApiErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          default: false
+        error:
+          type: string
+    ApiSeverFailureResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          default: false
+        message:
+          type: string
+          default: >-
+            Something went wrong we are sending expert monkeys to deal with this
+            situation

@@ -1,0 +1,16 @@
+{
+    "presets": [
+        "es2015",
+        "stage-2",
+    ],
+    // To keep async function run without an error "ReferenceError: regeneratorRuntime is not defined
+    "plugins": [
+        [
+            "transform-runtime",
+            {
+                "polyfill": false,
+                "regoenerator": true
+            }
+        ]
+    ]
+}

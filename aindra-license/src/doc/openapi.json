@@ -1,0 +1,587 @@
+{
+   "openapi": "3.0.0",
+   "info": {
+      "description": "License server API document. Server is built with NodeJs using CLEAN architecture",
+      "version": "1.0.0",
+      "title": "License Server",
+      "contact": {
+         "email": "raisonjosephau@gamil.com"
+      },
+      "license": {
+         "name": "Apache 2.0",
+         "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+      }
+   },
+   "servers": [
+      {
+         "url": "http://api.example.com/v1"
+      },
+      {
+         "url": "https://api.example.com/v1"
+      }
+   ],
+   "tags": [
+      {
+         "name": "License_Keys",
+         "description": "APIs for license keys"
+      },
+      {
+         "name": "License_Plans",
+         "description": "APIs for license plans"
+      }
+   ],
+   "paths": {
+      "/license-keys/": {
+         "get": {
+            "tags": ["License_Keys"],
+            "summary": "Get license keys from the database",
+            "description": "",
+            "operationId": "getLicenseKeys",
+            "responses": {
+               "200": {
+                  "description": "License keys from the system",
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "type": "object",
+                           "properties": {
+                              "success": {
+                                 "type": "boolean"
+                              },
+                              "data": {
+                                 "type": "array",
+                                 "items": {
+                                    "allOf": [
+                                       {
+                                          "$ref": "#/components/schemas/License_Key_Response"
+                                       }
+                                    ]
+                                 }
+                              }
+                           }
+                        }
+                     }
+                  }
+               },
+               "500": {
+                  "description": "Internal server error",
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/ApiSeverFailureResponse"
+                        }
+                     }
+                  }
+               }
+            }
+         },
+         "post": {
+            "tags": ["License_Keys"],
+            "summary": "Add a new license keys to the system",
+            "description": "",
+            "operationId": "addLicenseKeys",
+            "requestBody": {
+               "description": "License key to add in to the system",
+               "required": true,
+               "content": {
+                  "application/json": {
+                     "schema": {
+                        "$ref": "#/components/schemas/License_Key_Request"
+                     }
+                  }
+               }
+            },
+            "responses": {
+               "201": {
+                  "description": "Successful post",
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "type": "object",
+                           "properties": {
+                              "success": {
+                                 "type": "boolean",
+                                 "default": true
+                              },
+                              "data": {
+                                 "$ref": "#/components/schemas/License_Key_Response"
+                              }
+                           }
+                        }
+                     }
+                  }
+               },
+               "400": {
+                  "description": "Bad request",
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/ApiErrorResponse"
+                        }
+                     }
+                  }
+               },
+               "404": {
+                  "description": "Not found",
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/ApiErrorResponse"
+                        }
+                     }
+                  }
+               },
+               "500": {
+                  "description": "Internal server error",
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/ApiSeverFailureResponse"
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      },
+      "/license-keys/{licenseKeyId}": {
+         "patch": {
+            "tags": ["License_Keys"],
+            "summary": "Edit/Modify license keys",
+            "description": "",
+            "operationId": "patchLicnseKeys",
+            "parameters": [
+               {
+                  "name": "licenseKeyId",
+                  "in": "path",
+                  "required": true,
+                  "description": "License key id to be edited",
+                  "schema": {
+                     "type": "integer",
+                     "format": "int64",
+                     "minimum": 1
+                  }
+               }
+            ],
+            "requestBody": {
+               "description": "License details. Details that needs to be updated",
+               "required": true,
+               "content": {
+                  "application/json": {
+                     "schema": {
+                        "$ref": "#/components/schemas/License_Key_Request"
+                     }
+                  }
+               }
+            },
+            "responses": {
+               "201": {
+                  "description": "Successful patch",
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "type": "object",
+                           "properties": {
+                              "success": {
+                                 "type": "boolean"
+                              },
+                              "data": {
+                                 "$ref": "#/components/schemas/License_Key_Response"
+                              }
+                           }
+                        }
+                     }
+                  }
+               },
+               "400": {
+                  "description": "Bad request",
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/ApiErrorResponse"
+                        }
+                     }
+                  }
+               },
+               "404": {
+                  "description": "Not found",
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/ApiErrorResponse"
+                        }
+                     }
+                  }
+               },
+               "500": {
+                  "description": "Internal server error",
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/ApiSeverFailureResponse"
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      },
+      "/license-plans/": {
+         "get": {
+            "tags": ["License_Plans"],
+            "summary": "Get license plans from the database",
+            "description": "",
+            "operationId": "getLicensePlans",
+            "responses": {
+               "200": {
+                  "description": "License plans from the system",
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "type": "object",
+                           "properties": {
+                              "success": {
+                                 "type": "boolean"
+                              },
+                              "data": {
+                                 "type": "array",
+                                 "items": {
+                                    "allOf": [
+                                       {
+                                          "$ref": "#/components/schemas/License_Plan"
+                                       }
+                                    ]
+                                 }
+                              }
+                           }
+                        }
+                     }
+                  }
+               },
+               "500": {
+                  "description": "Internal server error",
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/ApiSeverFailureResponse"
+                        }
+                     }
+                  }
+               }
+            }
+         },
+         "post": {
+            "tags": ["License_Plans"],
+            "summary": "Add a new license plans to the system",
+            "description": "",
+            "operationId": "addLicensePlans",
+            "requestBody": {
+               "description": "License key to add in to the system",
+               "required": true,
+               "content": {
+                  "application/json": {
+                     "schema": {
+                        "$ref": "#/components/schemas/License_Plan"
+                     }
+                  }
+               }
+            },
+            "responses": {
+               "201": {
+                  "description": "Successful post",
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "type": "object",
+                           "properties": {
+                              "success": {
+                                 "type": "boolean",
+                                 "default": true
+                              },
+                              "data": {
+                                 "$ref": "#/components/schemas/License_Plan"
+                              }
+                           }
+                        }
+                     }
+                  }
+               },
+               "400": {
+                  "description": "Bad request",
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/ApiErrorResponse"
+                        }
+                     }
+                  }
+               },
+               "404": {
+                  "description": "Not found",
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/ApiErrorResponse"
+                        }
+                     }
+                  }
+               },
+               "500": {
+                  "description": "Internal server error",
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/ApiSeverFailureResponse"
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      },
+      "/license-plan/{licensePlanId}": {
+         "patch": {
+            "tags": ["License_Plans"],
+            "summary": "Edit/Modify license plans",
+            "description": "",
+            "operationId": "patchLicnsePlans",
+            "parameters": [
+               {
+                  "name": "licensePlanId",
+                  "in": "path",
+                  "required": true,
+                  "description": "License paln id to be edited",
+                  "schema": {
+                     "type": "integer",
+                     "format": "int64",
+                     "minimum": 1
+                  }
+               }
+            ],
+            "requestBody": {
+               "description": "License plan details. Details that needs to be updated",
+               "required": true,
+               "content": {
+                  "application/json": {
+                     "schema": {
+                        "$ref": "#/components/schemas/License_Plan"
+                     }
+                  }
+               }
+            },
+            "responses": {
+               "201": {
+                  "description": "Successful patch",
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "type": "object",
+                           "properties": {
+                              "success": {
+                                 "type": "boolean"
+                              },
+                              "data": {
+                                 "$ref": "#/components/schemas/License_Plan"
+                              }
+                           }
+                        }
+                     }
+                  }
+               },
+               "400": {
+                  "description": "Bad request",
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/ApiErrorResponse"
+                        }
+                     }
+                  }
+               },
+               "404": {
+                  "description": "Not found",
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/ApiErrorResponse"
+                        }
+                     }
+                  }
+               },
+               "500": {
+                  "description": "Internal server error",
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/ApiSeverFailureResponse"
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+   },
+   "security": [
+      {
+         "ApiKeyAuth": []
+      }
+   ],
+   "components": {
+      "securitySchemes": {
+         "ApiKeyAuth": {
+            "description": "`JWT Token`. Place the JWT token in the value field",
+            "type": "apiKey",
+            "in": "header",
+            "name": "authorization"
+         }
+      },
+      "schemas": {
+         "License_Plan": {
+            "type": "object",
+            "properties": {
+               "id": {
+                  "type": "integer",
+                  "format": "int64"
+               },
+               "license_plan_name": {
+                  "type": "string"
+               },
+               "license_validity_period_days": {
+                  "type": "integer",
+                  "format": "int64"
+               },
+               "license_max_user_count": {
+                  "type": "integer",
+                  "format": "int64"
+               },
+               "license_other_criteria": {
+                  "type": "string"
+               }
+            }
+         },
+         "License_Key_Request": {
+            "type": "object",
+            "properties": {
+               "id": {
+                  "type": "integer",
+                  "format": "int64"
+               },
+               "local_start_date": {
+                  "type": "string",
+                  "format": "date-time"
+               },
+               "local_expiry_date": {
+                  "type": "string",
+                  "format": "date-time"
+               },
+               "timezone": {
+                  "type": "string"
+               },
+               "is_active": {
+                  "type": "boolean",
+                  "default": true
+               },
+               "current_num_of_users": {
+                  "type": "integer",
+                  "format": "int64"
+               },
+               "license_plan_id": {
+                  "type": "integer",
+                  "format": "int64"
+               }
+            }
+         },
+         "License_Key_Response": {
+            "type": "object",
+            "properties": {
+               "id": {
+                  "type": "integer",
+                  "format": "int64"
+               },
+               "license_key": {
+                  "type": "string",
+                  "minLength": 3
+               },
+               "utc_start_date": {
+                  "type": "string",
+                  "format": "date-time"
+               },
+               "utc_expiry_date": {
+                  "type": "string",
+                  "format": "date-time"
+               },
+               "timezone": {
+                  "type": "string"
+               },
+               "is_active": {
+                  "type": "boolean",
+                  "default": true
+               },
+               "current_num_of_users": {
+                  "type": "integer",
+                  "format": "int64"
+               },
+               "license_plan_id": {
+                  "type": "integer",
+                  "format": "int64"
+               },
+               "record_last_modified": {
+                  "type": "string",
+                  "format": "date-time"
+               }
+            }
+         },
+         "ApiDeleteResponse": {
+            "type": "object",
+            "properties": {
+               "deletedCount": {
+                  "type": "integer",
+                  "format": "int64",
+                  "description": "Count of deleted organizations"
+               },
+               "message": {
+                  "type": "string"
+               }
+            }
+         },
+         "ApiSuccessResponse": {
+            "type": "object",
+            "properties": {
+               "success": {
+                  "type": "boolean",
+                  "default": true
+               },
+               "data": {
+                  "type": "object"
+               }
+            }
+         },
+         "ApiErrorResponse": {
+            "type": "object",
+            "properties": {
+               "success": {
+                  "type": "boolean",
+                  "default": false
+               },
+               "error": {
+                  "type": "string"
+               }
+            }
+         },
+         "ApiSeverFailureResponse": {
+            "type": "object",
+            "properties": {
+               "success": {
+                  "type": "boolean",
+                  "default": false
+               },
+               "message": {
+                  "type": "string",
+                  "default": "Something went wrong we are sending expert monkeys to deal with this situation"
+               }
+            }
+         }
+      }
+   }
+}
